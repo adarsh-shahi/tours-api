@@ -2,6 +2,9 @@ import express from "express";
 import fs from "fs";
 
 const app = express();
+
+app.use(express.json()); // adds body objet to request
+
 const PORT = 3000;
 
 // app.get("/", (req, res) => {
@@ -19,11 +22,38 @@ const tours = JSON.parse(
 app.get("/api/v1/tours", (req, res) => {
 	res.status(200).json({
 		status: "success",
-    results: tours.length,
+		results: tours.length,
 		data: {
-			tours
-		}
+			tours,
+		},
 	});
+});
+
+app.post("/api/v1/tours", (req, res) => {
+	// console.log(req.body)
+	const newId = tours[tours.length - 1]._id + 1;
+	// const newTour = {
+	//   newId,
+	//   name: req.body.name,
+	//   duration: req.body.duration,
+	//   maxGroupSize: req.body.maxGroupSize,
+	//   difficulty: req.body.difficulty
+	// }
+
+	const newTour = Object.assign({ _id: newId }, req.body);
+	tours.push(newTour);
+	fs.writeFile(
+		`./dev-data/data/tours.json`,
+		JSON.stringify(tours),
+		(err) => {
+			res.status(201).json({
+				status: "success",
+				data: {
+					tour: newTour,
+				},
+			});
+		}
+	);
 });
 
 app.listen(PORT, () => {
