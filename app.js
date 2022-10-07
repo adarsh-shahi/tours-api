@@ -29,6 +29,23 @@ app.get("/api/v1/tours", (req, res) => {
 	});
 });
 
+app.get("/api/v1/tours/:id", (req, res) => {
+	const id = Number(req.params.id);
+	if (id > 0 && tours.length >= id) {
+		res.status(200).json({
+			status: "success",
+			data: {
+				tour: tours[id - 1],
+			},
+		});
+	} else {
+		res.status(404).json({
+			status: "fail",
+			message: "Invalid ID",
+		});
+	}
+});
+
 app.post("/api/v1/tours", (req, res) => {
 	// console.log(req.body)
 	const newId = tours[tours.length - 1]._id + 1;
@@ -42,18 +59,14 @@ app.post("/api/v1/tours", (req, res) => {
 
 	const newTour = Object.assign({ _id: newId }, req.body);
 	tours.push(newTour);
-	fs.writeFile(
-		`./dev-data/data/tours.json`,
-		JSON.stringify(tours),
-		(err) => {
-			res.status(201).json({
-				status: "success",
-				data: {
-					tour: newTour,
-				},
-			});
-		}
-	);
+	fs.writeFile(`./dev-data/data/tours.json`, JSON.stringify(tours), (err) => {
+		res.status(201).json({
+			status: "success",
+			data: {
+				tour: newTour,
+			},
+		});
+	});
 });
 
 app.listen(PORT, () => {
