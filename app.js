@@ -69,6 +69,23 @@ app.post("/api/v1/tours", (req, res) => {
 	});
 });
 
+app.patch("/api/v1/tours/:id", (req, res) => {
+	const id = Number(req.params.id);
+	if (id > 0 && tours.length >= id) {
+		res.status(200).json({
+			status: "success",
+			data: {
+				tour: "<Updated tour here>",
+			},
+		});
+	} else {
+		res.status(404).json({
+			status: "fail",
+			message: "Invalid ID",
+		});
+	}
+});
+
 app.listen(PORT, () => {
 	console.log(`Listening on ${PORT}....`);
 });
