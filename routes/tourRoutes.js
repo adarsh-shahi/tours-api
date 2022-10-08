@@ -4,6 +4,8 @@ import * as tourHanlders from "../controllers/tourController.js";
 
 const router = express.Router();
 
+router.param("id", tourHanlders.checkId);
+
 router.route("/").get(tourHanlders.getAllTours).post(tourHanlders.createTour);
 router
 	.route("/:id")
