@@ -7,19 +7,11 @@ app.use(express.json()); // adds body objet to request
 
 const PORT = 3000;
 
-// app.get("/", (req, res) => {
-// 	// console.log(req);
-// 	res.status(200).json({ messgae: "Hello from server side", app: "Tour" });
-// });
-
-// app.post('/', (req, res) => {
-//   res.send('You can post to this endpoint')
-// })
 const tours = JSON.parse(
 	fs.readFileSync(`./dev-data/data/tours.json`, "utf-8")
 );
 
-app.get("/api/v1/tours", (req, res) => {
+const getAllTours = (req, res) => {
 	res.status(200).json({
 		status: "success",
 		results: tours.length,
@@ -27,9 +19,9 @@ app.get("/api/v1/tours", (req, res) => {
 			tours,
 		},
 	});
-});
+};
 
-app.get("/api/v1/tours/:id", (req, res) => {
+const getTour = (req, res) => {
 	const id = Number(req.params.id);
 	if (id > 0 && tours.length >= id) {
 		res.status(200).json({
@@ -44,32 +36,26 @@ app.get("/api/v1/tours/:id", (req, res) => {
 			message: "Invalid ID",
 		});
 	}
-});
+};
 
-app.post("/api/v1/tours", (req, res) => {
-	// console.log(req.body)
-	const newId = tours[tours.length - 1]._id + 1;
-	// const newTour = {
-	//   newId,
-	//   name: req.body.name,
-	//   duration: req.body.duration,
-	//   maxGroupSize: req.body.maxGroupSize,
-	//   difficulty: req.body.difficulty
-	// }
-
-	const newTour = Object.assign({ _id: newId }, req.body);
-	tours.push(newTour);
-	fs.writeFile(`./dev-data/data/tours.json`, JSON.stringify(tours), (err) => {
-		res.status(201).json({
+const createTour = (req, res) => {
+	const id = Number(req.params.id);
+	if (id > 0 && tours.length >= id) {
+		res.status(200).json({
 			status: "success",
 			data: {
-				tour: newTour,
+				tour: tours[id - 1],
 			},
 		});
-	});
-});
+	} else {
+		res.status(404).json({
+			status: "fail",
+			message: "Invalid ID",
+		});
+	}
+};
 
-app.patch("/api/v1/tours/:id", (req, res) => {
+const updateTour = (req, res) => {
 	const id = Number(req.params.id);
 	if (id > 0 && tours.length >= id) {
 		res.status(200).json({
@@ -84,9 +70,9 @@ app.patch("/api/v1/tours/:id", (req, res) => {
 			message: "Invalid ID",
 		});
 	}
-});
+};
 
-app.delete("/api/v1/tours/:id", (req, res) => {
+const deleteTour = (req, res) => {
 	const id = Number(req.params.id);
 	if (id > 0 && tours.length >= id) {
 		tours.splice(id, 1);
@@ -100,7 +86,20 @@ app.delete("/api/v1/tours/:id", (req, res) => {
 			message: "Invalid ID",
 		});
 	}
-});
+};
+
+// app.get("/api/v1/tours", getAllTours);
+// app.post("/api/v1/tours", createTour);
+// app.get("/api/v1/tours/:id", getTour);
+// app.patch("/api/v1/tours/:id", updateTour);
+// app.delete("/api/v1/tours/:id", deleteTour);
+
+app.route("/api/v1/tours").get(getAllTours).post(createTour);
+app
+	.route("/api/v1/tours/:id")
+	.get(getTour)
+	.patch(updateTour)
+	.delete(deleteTour);
 
 app.listen(PORT, () => {
 	console.log(`Listening on ${PORT}....`);
