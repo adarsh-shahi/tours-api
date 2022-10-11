@@ -14,12 +14,23 @@ const checkId = (req, res, next, val) => {
 	} else next();
 };
 
+const checkBody = (req, res, next) => {
+	if (Object.hasOwn(req.body, "name") && Object.hasOwn(req.body, "price"))
+		next();
+	else {
+		res.status(400).json({
+			status: "fail",
+			message: "must include property name and price",
+		});
+	}
+};
+
 const getAllTours = (req, res) => {
 	res.status(200).json({
 		status: "success",
 		results: tours.length,
 		data: {
-			tours
+			tours,
 		},
 	});
 };
@@ -68,4 +79,12 @@ const deleteTour = (req, res) => {
 	});
 };
 
-export { checkId, getAllTours, getTour, createTour, updateTour, deleteTour };
+export {
+	checkBody,
+	checkId,
+	getAllTours,
+	getTour,
+	createTour,
+	updateTour,
+	deleteTour,
+};
