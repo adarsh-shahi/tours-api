@@ -8,10 +8,8 @@ const app = express();
 app.use(express.json()); // adds body objet to request
 
 
-
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
-
 
 export default app
 
