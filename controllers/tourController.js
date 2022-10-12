@@ -29,14 +29,24 @@ const getAllTours = async (req, res) => {
 	}
 };
 
-const getTour = (req, res) => {
-	const id = Number(req.params.id);
-	res.status(200).json({
-		status: "success",
-		data: {
-			// tour: tours[id - 1],
-		},
-	});
+const getTour = async (req, res) => {
+
+	try{
+		// Tour.findOne({_id: req.params.id})
+		const tour = await Tour.findById(req.params.id)
+		res.status(200).json({
+			status: "success",
+			data: tour
+		});
+	}catch(err){
+		res.status(404).json({
+			status: "fail",
+			message: err,
+		});
+	}
+
+	
+	
 };
 
 const createTour = async (req, res) => {
