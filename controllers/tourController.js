@@ -11,14 +11,22 @@ import Tour from "../models/tourModel.js";
 // 	}
 // };
 
-const getAllTours = (req, res) => {
-	res.status(200).json({
-		status: "success",
-		// results: tours.length,
-		// data: {
-		// 	tours,
-		// },
-	});
+const getAllTours = async (req, res) => {
+	try {
+		const tours = await Tour.find();  // returns all list in DB
+		res.status(200).json({
+			status: "success",
+			results: tours.length,
+			data: {
+				tours,
+			},
+		});
+	} catch (err) {
+		res.status(404).json({
+			status: "fail",
+			message: err,
+		});
+	}
 };
 
 const getTour = (req, res) => {
@@ -47,8 +55,8 @@ const createTour = async (req, res) => {
 	} catch (err) {
 		res.status(400).json({
 			status: "fail",
-			message: err
-		})
+			message: err,
+		});
 	}
 };
 
