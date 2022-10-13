@@ -2,7 +2,15 @@ import Tour from "../models/tourModel.js";
 
 const getAllTours = async (req, res) => {
 	try {
-		const tours = await Tour.find(req.query); // returns all list in DB filters applied
+		const queryObj = { ...req.query };
+		const excludeFields = ["page", "sort", "limit", "fields"];
+
+		excludeFields.forEach((el) => {
+			delete queryObj[el];
+		});
+		console.log(req.query, queryObj);
+
+		const tours = await Tour.find(queryObj); // returns all list in DB filters applied
 		res.status(200).json({
 			status: "success",
 			results: tours.length,
