@@ -1,19 +1,8 @@
 import Tour from "../models/tourModel.js";
 
-// const checkBody = (req, res, next) => {
-// 	if (Object.hasOwn(req.body, "name") && Object.hasOwn(req.body, "price"))
-// 		next();
-// 	else {
-// 		res.status(400).json({
-// 			status: "fail",
-// 			message: "must include property name and price",
-// 		});
-// 	}
-// };
-
 const getAllTours = async (req, res) => {
 	try {
-		const tours = await Tour.find(); // returns all list in DB
+		const tours = await Tour.find(req.query); // returns all list in DB filters applied
 		res.status(200).json({
 			status: "success",
 			results: tours.length,
@@ -71,7 +60,7 @@ const updateTour = async (req, res) => {
 	try {
 		const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
 			new: true, // new updated account will be returned
-			runValidators: true // will run the validators again on updated data
+			runValidators: true, // will run the validators again on updated data
 		});
 		res.status(200).json({
 			status: "success",
@@ -88,14 +77,13 @@ const updateTour = async (req, res) => {
 };
 
 const deleteTour = async (req, res) => {
-	try{
-		await Tour.findByIdAndDelete(req.params.id)
+	try {
+		await Tour.findByIdAndDelete(req.params.id);
 		res.status(204).json({
 			status: "success",
 			data: null,
 		});
-	}
-	catch(err){
+	} catch (err) {
 		res.status(400).json({
 			status: "fail",
 			message: err,
