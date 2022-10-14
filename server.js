@@ -4,7 +4,9 @@ dotenv.config({path: './config.env'})
 
 import app from './app.js'
 
-mongoose.connect(process.env.DATABASE_URL, {
+const DATABASE_URL = process.env.DATABASE_STRING.replace('<password>',process.env.DATABASE_PASSWORD)
+
+mongoose.connect(DATABASE_URL, {
 	useNewUrlParser: true
 }).then(con => {
 	console.log(`DB connected sucessfully`);
