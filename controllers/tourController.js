@@ -23,7 +23,17 @@ const getAllTours = async (req, res) => {
 			return `$${matched}`; // just subsets E.g lterr contains lt but we dont want this
 		}); // '\g' to match all the operators not just one
 
-		const query = Tour.find(JSON.parse(queryStr)); // returns query object
+		let query = Tour.find(JSON.parse(queryStr)); // returns query object
+
+		// Sorting
+		if(req.query.sort){
+			const sortBy = req.query.sort.split(',').join(' ')
+			console.log(sortBy);
+			query = query.sort(sortBy)   // sort('price ratingsAverage')
+		}else{
+			query = query.sort('-createdAt')
+		}
+
 
 		const tours = await query; //  excutes the query and come backs with the document
 
