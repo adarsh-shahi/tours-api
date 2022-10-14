@@ -34,6 +34,15 @@ const getAllTours = async (req, res) => {
 			query = query.sort('-createdAt')
 		}
 
+		// Fielding limiting
+		if(req.query.fields){
+			const fields = req.query.fields.split(',').join(' ')
+			query = query.select(fields) //select('name duration price') 
+		}
+		else{
+			query = query.select('-__v') // not sending back '__v' property
+		}
+
 
 		const tours = await query; //  excutes the query and come backs with the document
 
