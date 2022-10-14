@@ -10,7 +10,23 @@ const getAllTours = async (req, res) => {
 		});
 		console.log(req.query, queryObj);
 
-		const tours = await Tour.find(queryObj); // returns all list in DB filters applied
+		/*
+		 * Advance filtering (using <, >, <=, >= operators)
+		 *	{ duration: { gte: '5' } }  req.query
+		 *	add $ before (gte, lte, gt, lt)
+		 *	{ duration: { $gte: '5' } } pass this object to mongoose find() method
+		 */
+
+		let queryStr = JSON.stringify(queryObj);
+		queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (matched) => {
+			//   '\b' used for exact match of words not
+			return `$${matched}`; // just subsets E.g lterr contains lt but we dont want this
+		}); // '\g' to match all the operators not just one
+
+		const query = Tour.find(JSON.parse(queryStr)); // returns query object
+
+		const tours = await query; //  excutes the query and come backs with the document
+
 		res.status(200).json({
 			status: "success",
 			results: tours.length,
