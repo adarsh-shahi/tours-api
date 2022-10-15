@@ -34,7 +34,7 @@ const getAllTours = async (req, res) => {
 			query = query.sort('-createdAt')
 		}
 
-		// Fielding limiting
+		// Field limiting
 		if(req.query.fields){
 			const fields = req.query.fields.split(',').join(' ')
 			query = query.select(fields) //select('name duration price') 
@@ -43,6 +43,14 @@ const getAllTours = async (req, res) => {
 			query = query.select('-__v') // not sending back '__v' property
 		}
 
+		//Pagination
+		// page=3&limit=10   1-10(page 1)    11-20(page 2)    21-30(page 3)
+		
+		const page = Number(req.query.page) || 1
+		const limit = Number(req.query.limit) || 10
+		const skip = (page - 1) * limit
+		
+		query = query.skip(skip).limit(limit)
 
 		const tours = await query; //  excutes the query and come backs with the document
 
