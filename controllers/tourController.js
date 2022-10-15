@@ -1,73 +1,22 @@
 import Tour from "../models/tourModel.js";
+import APIFeatures from "../utils/apiFeatures.js";
 
-const aliasTopTours = async(req, res, next) => {
-	req.query.limit = '5'
-	req.query.sort = '-ratingsAverage,price';
-	req.query.fields = 'name,price,ratingsAverage,summary,difficulty'
+const aliasTopTours = async (req, res, next) => {
+	req.query.limit = "5";
+	req.query.sort = "-ratingsAverage,price";
+	req.query.fields = "name,price,ratingsAverage,summary,difficulty";
 	next();
-}
-
+};
 
 const getAllTours = async (req, res) => {
 	try {
-		const queryObj = { ...req.query };
-		const excludeFields = ["page", "sort", "limit", "fields"];
+		const features = new APIFeatures(Tour.find(), req.query);
 
-		excludeFields.forEach((el) => {
-			delete queryObj[el];
-		});
-		console.log(req.query, queryObj);
+		features.filter().sort().limiting().pagination();
 
-		/*
-		 * Advance filtering (using <, >, <=, >= operators)
-		 *	{ duration: { gte: '5' } }  req.query
-		 *	add $ before (gte, lte, gt, lt)
-		 *	{ duration: { $gte: '5' } } pass this object to mongoose find() method
-		 */
+		const tours = await features.query; //  excutes the query and come backs with the document
 
-		let queryStr = JSON.stringify(queryObj);
-		queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (matched) => {
-			//   '\b' used for exact match of words not
-			return `$${matched}`; // just subsets E.g lterr contains lt but we dont want this
-		}); // '\g' to match all the operators not just one
-
-		let query = Tour.find(JSON.parse(queryStr)); // returns query object
-
-		// Sorting
-		if(req.query.sort){
-			const sortBy = req.query.sort.split(',').join(' ')
-			console.log(sortBy);
-			query = query.sort(sortBy)   // sort('price ratingsAverage')
-		}else{
-			query = query.sort('-createdAt')
-		}
-
-		// Field limiting
-		if(req.query.fields){
-			const fields = req.query.fields.split(',').join(' ')
-			query = query.select(fields) //select('name duration price') 
-		}
-		else{
-			query = query.select('-__v') // not sending back '__v' property
-		}
-
-		//Pagination
-		// page=3&limit=10   1-10(page 1)    11-20(page 2)    21-30(page 3)
-		
-		const page = Number(req.query.page) || 1
-		const limit = Number(req.query.limit) || 10
-		const skip = (page - 1) * limit
-
-		query = query.skip(skip).limit(limit)
-
-		if(req.query.page){
-			const numTours = await Tour.countDocuments();
-			if(skip >= numTours) throw new Error("This page dosen't exist")
-		}
-
-		const tours = await query; //  excutes the query and come backs with the document
-
-		res.status(200).json({ 
+		res.status(200).json({
 			status: "success",
 			results: tours.length,
 			data: {
@@ -155,4 +104,11 @@ const deleteTour = async (req, res) => {
 	}
 };
 
-export {aliasTopTours, getAllTours, getTour, createTour, updateTour, deleteTour };
+export {
+	aliasTopTours,
+	getAllTours,
+	getTour,
+	createTour,
+	updateTour,
+	deleteTour,
+};
