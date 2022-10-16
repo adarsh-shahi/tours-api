@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import slugify from "slugify";
 
 const tourSchema = new mongoose.Schema({
 	name: {
@@ -31,6 +32,7 @@ const tourSchema = new mongoose.Schema({
 		required: [true, "A tour must have a price"],
 	},
 	priceDiscount: Number,
+	slug: String,
 	summary: {
 		type: String,
 		trim: true,
@@ -46,7 +48,7 @@ const tourSchema = new mongoose.Schema({
 	},
 	images: [String],
 	createAt: {
-		type: Date,
+		type: Date, 
 		default: Date.now(),
 		select: false,
 	},
@@ -66,6 +68,19 @@ const tourSchema = new mongoose.Schema({
 tourSchema.virtual('durationWeeks').get(function(){
 	return this.duration / 7;
 })
+
+// DOCUMENT MIDDLEWARE(Hooks) - 'save' runs for .save() and .create()
+// tourSchema.pre('save', function(next) {
+// 	console.log(this);
+// 	this.slug = slugify(this.name, {lower: true});
+// 	next()
+// })
+
+// have access to document that is just saved
+// tourSchema.post('save', function(document, next){
+// 	console.log(document);
+// 	next();
+// })
 
 const Tour = mongoose.model("Tour", tourSchema);
 
