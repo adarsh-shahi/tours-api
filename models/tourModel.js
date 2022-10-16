@@ -53,6 +53,10 @@ const tourSchema = new mongoose.Schema({
 		select: false,
 	},
 	startDates: [Date],
+	secretTour:{
+		type: Boolean,
+		default: false
+	}
 }, {
 	toJSON: { virtuals: true},
 	toObject: { virtuals: true},
@@ -80,6 +84,19 @@ tourSchema.virtual('durationWeeks').get(function(){
 // tourSchema.post('save', function(document, next){
 // 	console.log(document);
 // 	next();
+// })
+
+// QUERY MIDDLEWARE
+// tourSchema.pre(/^find/, function(next){  // all the strings that start with find
+	// this will point to current query object
+// 	this.find({secretTour: {$ne: true}})
+// 	this.start = Date.now();
+// 	next()
+// })
+
+// tourSchema.post(/^find/, function(document, next){
+// 	console.log(`Query took ${Date.now() - this.start} milliseconds`);
+// 	next()
 // })
 
 const Tour = mongoose.model("Tour", tourSchema);
