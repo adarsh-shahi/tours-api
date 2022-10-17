@@ -25,7 +25,7 @@ class APIFeatures {
 			return `$${matched}`; // just subsets E.g lterr contains lt but we dont want this
 		}); // '\g' to match all the operators not just one
 
-		this.query.find(JSON.parse(queryStr)); // returns query object
+		this.query = this.query.find(JSON.parse(queryStr)); // returns query object
 		return this;
 	}
 

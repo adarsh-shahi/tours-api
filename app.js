@@ -4,6 +4,7 @@ import userRouter from './routes/userRoutes.js'
 import AppError from "./utils/appError.js";
 import { errorHandler } from "./controllers/errorController.js";
 
+
 const app = express();
 
 // MIDDLEWARES
@@ -28,6 +29,7 @@ app.all('*',(req, res, next) => {
   next(error);  // if next receives an argument no matter what it is, automatically knows it was an error
               // will also skip all other middlewares in the stack and go to global error handling middleware
 })
+
 
 app.use(errorHandler)
 

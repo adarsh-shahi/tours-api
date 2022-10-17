@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		required: [true, "user should have a name"],
 		minlength: 8,
+		select: false // will never show up in any output but will be saved in DB
 	},
 	passwordConfirm: {
 		type: String,
@@ -51,13 +52,18 @@ const userSchema = new mongoose.Schema({
 
 // Encrypting passwords - if password was modified
 userSchema.pre("save", async function(next) {
-	console.log(`through hashing`);
 	if (this.isModified("password")) {
 		this.password = await bcrypt.hash(this.password, 12);
 		this.passwordConfirm = undefined; // deleting a field before saving in DB
 	}
 	next();
 });
+
+
+// this instance method will work on a a specific document
+userSchema.methods.correctPassword = async function(candidatePassowrd, userPassowrd){
+	return await bcrypt.compare(candidatePassowrd, userPassowrd)
+}
 
 const User = new mongoose.model("User", userSchema);
 

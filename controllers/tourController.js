@@ -11,7 +11,6 @@ const aliasTopTours = async (req, res, next) => {
 const getAllTours = async (req, res) => {
 	try {
 		const features = new APIFeatures(Tour.find(), req.query);
-
 		features.filter().sort().limiting().pagination();
 
 		const tours = await features.query; //  excutes the query and come backs with the document
