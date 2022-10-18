@@ -2,6 +2,7 @@ import { promisify } from "util";
 import User from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import AppError from "../utils/appError.js";
+import { nextTick } from "process";
 
 const signToken = (id) => {
 	return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -17,14 +18,14 @@ const signup = async (req, res, next) => {
 			password: req.body.password,
 			passwordConfirm: req.body.passwordConfirm,
 			passwordChangedAt: req.body.passwordChangedAt,
+			role: req.body.role,
 		});
 
 		res.status(201).json({
 			status: "success",
 			token: signToken(newUser._id),
 			user: {
-				name: newUser.name,
-				email: newUser.email,
+				newUser,
 			},
 		});
 	} catch (err) {
@@ -88,4 +89,17 @@ const protect = async (req, res, next) => {
 	}
 };
 
-export { protect, signup, login };
+const restrictTo = (...roles) => {
+	return (req, res, next) => {
+		if (!roles.includes(req.user.role))
+			return next(
+				new AppError(
+					403,
+					"you do not have the permission to perform this action"
+				)
+			);
+		next();
+	};
+};
+
+export { restrictTo, protect, signup, login };
