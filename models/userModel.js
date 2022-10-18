@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
-import bcrypt from 'bcryptjs'
-
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
 	name: {
@@ -34,7 +33,7 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		required: [true, "user should have a name"],
 		minlength: 8,
-		select: false // will never show up in any output but will be saved in DB
+		select: false, // will never show up in any output but will be saved in DB
 	},
 	passwordConfirm: {
 		type: String,
@@ -48,10 +47,11 @@ const userSchema = new mongoose.Schema({
 			message: `Passwords dosen't match`,
 		},
 	},
+	passwordChangedAt: Date,
 });
 
 // Encrypting passwords - if password was modified
-userSchema.pre("save", async function(next) {
+userSchema.pre("save", async function (next) {
 	if (this.isModified("password")) {
 		this.password = await bcrypt.hash(this.password, 12);
 		this.passwordConfirm = undefined; // deleting a field before saving in DB
@@ -59,14 +59,21 @@ userSchema.pre("save", async function(next) {
 	next();
 });
 
-
 // this instance method will work on a a specific document
-userSchema.methods.correctPassword = async function(candidatePassowrd, userPassowrd){
-	return await bcrypt.compare(candidatePassowrd, userPassowrd)
-}
+userSchema.methods.correctPassword = async function (
+	candidatePassowrd,
+	userPassowrd
+) {
+	return await bcrypt.compare(candidatePassowrd, userPassowrd);
+};
+
+userSchema.methods.changedPasswordAfter = async function (JWTTimestamp) {
+	return (
+		this.passwordChangedAt &&
+		parseInt(this.passwordChangedAt.getTime() / 1000, 10) > JWTTimestamp
+	);
+};
 
 const User = new mongoose.model("User", userSchema);
-
-
 
 export default User;
